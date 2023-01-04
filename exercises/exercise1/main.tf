@@ -109,7 +109,6 @@ resource "aws_security_group" "webserver" {
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = var.key_name
   public_key = file(pathexpand("~/.ssh/id_rsa.pub"))
 }
 
