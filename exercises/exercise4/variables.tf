@@ -1,7 +1,3 @@
-variable "workstation_ip" {
-  type = string
-}
-
 variable "environment" {
   type    = string
   default = "demo"

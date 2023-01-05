@@ -4,12 +4,24 @@ terraform {
       source = "hashicorp/aws"
       version = "4.48.0"
     }
+    http = {
+      source = "hashicorp/http"
+      version = "3.2.1"
+    }
   }
 }
 
 provider "aws" {
   region = "us-west-2"
   profile = "training-tf"
+}
+
+data "http" "workstation_ip" {
+  url = "https://api.ipify.org/"
+}
+
+locals {
+  workstation_cidr = "${data.http.workstation_ip.response_body}/32"
 }
 
 data "aws_ami" "ubuntu" {
@@ -165,7 +177,7 @@ resource "aws_security_group" "webserver" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.workstation_ip]
+    cidr_blocks = [local.workstation_cidr]
   }
 
   ingress {

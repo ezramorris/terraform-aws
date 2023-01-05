@@ -4,12 +4,24 @@ terraform {
       source = "hashicorp/aws"
       version = "4.48.0"
     }
+    http = {
+      source = "hashicorp/http"
+      version = "3.2.1"
+    }
   }
 }
 
 provider "aws" {
   region = "us-west-2"
   profile = "training-tf"
+}
+
+data "http" "workstation_ip" {
+  url = "https://api.ipify.org/"
+}
+
+locals {
+  workstation_cidr = "${data.http.workstation_ip.response_body}/32"
 }
 
 #====================================
@@ -27,7 +39,7 @@ module "security" {
   source = "./modules/security"
 
   vpc_id         = module.network.vpc_id
-  workstation_ip = var.workstation_ip
+  workstation_ip = local.workstation_cidr
 
   depends_on = [
     module.network
