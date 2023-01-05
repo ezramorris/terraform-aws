@@ -36,11 +36,17 @@ module "security" {
 
 #====================================
 
+resource "aws_key_pair" "deployer" {
+  public_key = file(pathexpand("~/.ssh/id_rsa.pub"))
+}
+
+#====================================
+
 module "bastion" {
   source = "./modules/bastion"
 
   instance_type = var.bastion_instance_type
-  key_name      = var.key_name
+  key_name      = aws_key_pair.deployer.key_name
   subnet_id     = module.network.public_subnets[0]
   sg_id         = module.security.bastion_sg_id
 
@@ -56,7 +62,7 @@ module "storage" {
   source = "./modules/storage"
 
   instance_type = var.db_instance_type
-  key_name      = var.key_name
+  key_name      = aws_key_pair.deployer.key_name
   subnet_id     = module.network.private_subnets[0]
   sg_id         = module.security.mongodb_sg_id
 
@@ -72,7 +78,7 @@ module "application" {
   source = "./modules/application"
 
   instance_type   = var.app_instance_type
-  key_name        = var.key_name
+  key_name        = aws_key_pair.deployer.key_name
   vpc_id          = module.network.vpc_id
   public_subnets  = module.network.public_subnets
   private_subnets = module.network.private_subnets

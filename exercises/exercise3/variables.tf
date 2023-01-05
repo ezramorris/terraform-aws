@@ -1,9 +1,6 @@
 variable "instance_type" {
   type = string
 }
-variable "key_name" {
-  type = string
-}
 
 variable "availability_zones" {
   type = list(string)
